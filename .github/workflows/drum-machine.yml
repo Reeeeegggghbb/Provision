@@ -1,0 +1,27 @@
+name: Drum machine
+
+on:
+  push:
+    paths: ['drum-machine/**', '.github/workflows/drum-machine.yml']
+  pull_request:
+    paths: ['drum-machine/**', '.github/workflows/drum-machine.yml']
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: drum-machine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: drum-machine/package-lock.json
+      - run: npm ci
+      - run: npm run check
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+        env:
+          CI: '1'
